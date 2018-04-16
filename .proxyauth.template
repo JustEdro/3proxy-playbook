@@ -1,0 +1,6 @@
+# user:CR:$1$fuckrkn$ujZ1kYu11CUcASyZgJQgU.
+# CL - пароль в открытом тексте
+# CR - пароль в формате crypt() (только MD5)
+# NT - пароль в формате NT в шестнадцатеричной кодировке
+
+# usage: mycrypt salt somepassword -> CR:$1$salt$LVfIwfMLWcL5djHiqkI3P.

@@ -1,0 +1,108 @@
+
+---
+- hosts: proxy
+  remote_user: root
+  vars: 
+    proxy_version: 0.8.11
+    proxy_gid: 999
+    proxy_uid: 999
+
+  tasks:
+  - name: Create group
+    group: 
+      name: proxy3
+      gid: "{{ proxy_gid }}"
+
+  - name: Create user
+    user: 
+      name: proxy3
+      group: proxy3
+      create_home: no
+      system: yes
+      uid: "{{ proxy_uid }}"
+
+  - name: Install packages
+    apt:
+      name: "{{ item }}"
+      update_cache: yes
+    with_items:
+      - build-essential 
+      - nano
+      - wget
+      - tar
+      - gzip
+
+  - name: Download sources
+    get_url:
+      url: "https://github.com/z3APA3A/3proxy/archive/{{ proxy_version }}.tar.gz"
+      dest: "/tmp/3proxy-{{ proxy_version }}.tar.gz"
+
+  - name: Expand archive
+    unarchive:
+      src: "/tmp/3proxy-{{ proxy_version }}.tar.gz"
+      dest: "/tmp"
+      creates: "/tmp/3proxy-{{ proxy_version }}/README"
+      copy: no
+
+  - name: Build 
+    command: make -f Makefile.Linux
+    args:
+      chdir: /tmp/3proxy-{{ proxy_version }}
+      creates: /tmp/3proxy-{{ proxy_version }}/src/3proxy
+
+  - name: Install proxy
+    copy:
+      src: /tmp/3proxy-{{ proxy_version }}/src/3proxy
+      dest: /usr/bin/3proxy
+      owner: proxy3
+      group: proxy3
+      mode: 0755
+      remote_src: yes
+
+  - name: Install mycrypt
+    copy:
+      src: /tmp/3proxy-{{ proxy_version }}/src/mycrypt
+      dest: /usr/bin/mycrypt
+      owner: proxy3
+      group: proxy3
+      mode: 0755
+      remote_src: yes
+
+  - name: Create config dir
+    file: path=/etc/3proxy state=directory owner=proxy3 group=proxy3
+
+  - name: Create config
+    template:
+      src: 3proxy.cfg.template
+      dest: /etc/3proxy/3proxy.cfg
+      owner: proxy3
+      group: proxy3
+      mode: 0644    
+
+  - name: Create auth file
+    template:
+      src: .proxyauth
+      dest: /etc/3proxy/.proxyauth
+      owner: proxy3
+      group: proxy3
+      mode: 0644
+
+  - name: Setup service
+    template:
+      src: 3proxy.service 
+      dest: /etc/systemd/system/3proxy.service
+
+  - name: Run service
+    service:
+      name: 3proxy
+      state: restarted
+
+  - name: Setup firewall
+    ufw: 
+      state: enabled
+      rule: allow
+      proto: tcp
+      port: "{{ item }}"
+    with_items:
+      - 22 
+      - 50228

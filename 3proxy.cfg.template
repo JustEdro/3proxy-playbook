@@ -1,0 +1,12 @@
+setgid {{ proxy_gid }}
+setuid {{ proxy_uid }}
+nserver 8.8.8.8
+nserver 8.8.4.4
+nscache 65536
+timeouts 1 5 30 60 180 1800 15 60
+users $/etc/3proxy/.proxyauth
+pidfile /etc/3proxy/3proxy.pid
+daemon
+auth cache strong
+#proxy -n -p3128 -a
+socks -p50228
