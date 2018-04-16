@@ -1,3 +1,7 @@
+SOCKS5 proxy setting up script.
+Tested on [Digital Ocean droplet](http://www.digitalocean.com/?refcode=a2c0ba080f43).
+
+
 1. Create ansible inventory named "hosts", use "hosts.template"
 2. Create user list ".proxyauth" using ".proxyauth.template" or just leave as-is to configure later.
 3. Run:
