@@ -1,4 +1,4 @@
-SOCKS5 proxy setting up script.
+A script to set up SOCKS5 proxy. Can be used for Telegram.
 Tested on [Digital Ocean droplet](http://www.digitalocean.com/?refcode=a2c0ba080f43).
 
 
